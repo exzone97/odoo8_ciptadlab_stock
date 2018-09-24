@@ -4,8 +4,8 @@ from openerp.exceptions import ValidationError
 class stock_picking_recap(models.Model):
     _name = 'stock.picking.recap'
     _description = ''
+
     recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: field.datetime.now())
-    calculated_date = fields.Datetime('Calculated Date')
     # BELUM : calculate by diisi otomatis
     calculated_by = fields.Many2one('res.user', 'Calculated By')
     comfirm_date = fields.Datetime('Confirm Date')
@@ -16,7 +16,7 @@ class stock_picking_recap(models.Model):
             ('draft', 'Draft'),
             ('calculated', 'Calculated'),
             ('confirmed','Confirmed')
-            ],
+        ],
         string='State',
         required=True,
         default='draft'
