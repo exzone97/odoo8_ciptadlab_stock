@@ -9,6 +9,6 @@
 		'stock',
 	],
 	'data': [
-		'views/.xml',
+		'views/stock_recap_view.xml',
 	]
 }
