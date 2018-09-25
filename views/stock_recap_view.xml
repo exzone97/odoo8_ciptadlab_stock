@@ -1,8 +1,10 @@
 <openerp>
 	<data>
 		<menuitem sequence="23" id="stock_picking_recap_root" name="Stock Picking Recap" />
-		<menuitem sequence="1" id="stock_picking_recap_menu" name="recap" parent="stock_picking_recap_root" /> 
-		<!-- Fee Setting =============================================================================================================== -->
+		<menuitem sequence="1" id="stock_picking_recap_menu" name="Recap" parent="stock_picking_recap_root" /> 
+		<menuitem sequence="2" id="stock_picking_recap_line_menu" name="Recap Line" parent="stock_picking_recap_root" /> 
+		<menuitem sequence="3" id="stock_move_menu" name="Stock Move" parent="stock_picking_recap_root" /> 
+		<!-- Stock Picking Recap =============================================================================================================== -->
 		<record id="stock_picking_recap_form" model="ir.ui.view">
 			<field name="name">stock.picking.recap.form</field>
 			<field name="model">stock.picking.recap</field>
@@ -19,8 +21,9 @@
 						<field name="calculated_by"  readonly="1" />
 						<field name="confirm_by"/>
 						<field name="operation_count" />
+						<field name="recap_amount" />
 						<field name="stock_picking_type_id" />
-						<field name="stock_recap_line_ids" readonly="1" />
+						<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}" />
 						<field name="stock_move_ids" readonly="1" />
 					</group>
 				</form>
@@ -43,12 +46,80 @@
 		</record>
 
 		<record id="stock_picking_recap_setting" model="ir.actions.act_window">
-			<field name="name">Stock Picking Recap Setting</field>
+			<field name="name">Stock Picking Recap</field>
 			<field name="res_model">stock.picking.recap</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
 
 		<menuitem sequence="1" id="stock_picking_recap_menu_setting" parent="stock_picking_recap_menu" action="stock_picking_recap_setting" />
+
+		<!-- Stock Picking Recap Line =============================================================================================================== -->
+		<record id="stock_picking_recap_line_form" model="ir.ui.view">
+			<field name="name">stock.picking.recap.line.form</field>
+			<field name="model">stock.picking.recap.line</field>
+			<field name="arch" type="xml">
+				<form >
+					<group>
+						<field name="recap_id" />
+						<field name="product_id"  />
+						<field name="qty" />
+						<field name="unit_price" />
+						<field name="subtotal" />
+					</group>
+				</form>
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="stock_picking_recap_line_tree">
+			<field name="name">stock.picking.recap.line.tree</field>
+			<field name="model">stock.picking.recap.line</field>
+			<field name="arch" type="xml">
+				<tree >
+					<field name="recap_id" />
+					<field name="product_id"   />
+					<field name="qty" />
+					<field name="unit_price" />
+					<field name="subtotal" />
+				</tree>
+			</field>
+		</record>
+
+		<record id="stock_picking_recap_line_setting" model="ir.actions.act_window">
+			<field name="name">Stock Picking Recap Line</field>
+			<field name="res_model">stock.picking.recap.line</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<menuitem sequence="1" id="stock_picking_recap_line_menu_setting" parent="stock_picking_recap_line_menu" action="stock_picking_recap_line_setting" />
+
+		<!-- Stock Picking Move =============================================================================================================== -->
+		<record id="stock_move_form" model="ir.ui.view">
+			<field name="name">stock.move.form</field>
+			<field name="model">stock.move</field>
+			<field name="arch" type="xml">
+				<field name="stock_recap_id" />
+			</field>
+		</record>
+
+		<record model="ir.ui.view" id="stock_move_tree">
+			<field name="name">stock.move.tree</field>
+			<field name="model">stock.move</field>
+			<field name="arch" type="xml">
+				<tree >
+					<field name="stock_recap_id"  />
+				</tree>
+			</field>
+		</record>
+
+		<record id="stock_move_setting" model="ir.actions.act_window">
+			<field name="name">Stock Move</field>
+			<field name="res_model">stock.move</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<menuitem sequence="1" id="stock_move_menu_setting" parent="stock_move_menu" action="stock_move_setting" />
 	</data>
 </openerp>

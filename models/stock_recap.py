@@ -29,7 +29,7 @@ class stock_picking_recap(models.Model):
 	recap_amount = fields.Float('Recap Amount')
 	stock_picking_type_id = fields.Many2one('stock.picking.type', required=True, ondeleted='restrict')
 	stock_recap_line_ids = fields.One2many('stock.picking.recap.line', 'recap_id', 'Detail Recap')
-	stock_move_ids = fields.One2many('stock.move','stock_recap_id', 'Stock Operation Detail')
+	stock_move_ids = fields.One2many('stock.move','stock_recap_id', 'Stock Operation Detail', readonly=True)
 
 # OVERRIDE ------------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +71,22 @@ class stock_picking_recap_line(models.Model):
 	qty = fields.Float('Quantity')
 	unit_price = fields.Float('Unit Price')
 	# subtotal computed qty*unit_price
-	subtotal = fields.Float('Subtotal')
+	subtotal = fields.Float('Subtotal',compute="_compute_subtotal")
+
+	@api.one
+	def _compute_subtotal(self):
+		self.subtotal = self.qty * self.unit_price
+
+	@api.model
+	def create(self,vals):
+		rec = super(stock_picking_recap_line, self).create(vals)
+		context = self._context
+		current_uid = context.get('uid')
+		product = self.env['product.product'].browse(self.product_id)
+		rec.unit_price = product.standard_price
+
+		return rec 
+		
 
 class stock_move(models.Model):
 
