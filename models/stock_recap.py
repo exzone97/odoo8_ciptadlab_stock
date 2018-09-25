@@ -10,7 +10,7 @@ class stock_picking_recap(models.Model):
     calculated_by = fields.Many2one('res.user', 'Calculated By')
     comfirm_date = fields.Datetime('Confirm Date')
     # BELUM : confirm by diisi otomatis
-    confirm_by = fields.Many2one('res.user', 'Confirm By')
+    confirm_by = fields.Many2one('res.user', 'Confirm By', default=lambda self: self.env.user)
     state = fields.Selection(
         selection=[
             ('draft', 'Draft'),
