@@ -112,7 +112,9 @@
 			<field name="name">stock.move.form</field>
 			<field name="model">stock.move</field>
 			<field name="arch" type="xml">
-				<field name="stock_recap_id" />
+				<form>
+					<field name="stock_recap_id" />
+				</form>
 			</field>
 		</record>
 
