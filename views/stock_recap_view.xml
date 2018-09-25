@@ -9,16 +9,19 @@
 			<field name="arch" type="xml">
 				<form >
 					<header>
+						<button type="object" name="action_calculated" string="Calculate" attrs="{'invisible':['|',('state','=','calculated'),('state','=','confirmed')]}" />
+						<button type="object" name="action_confirm" string="Confirm" attrs="{'invisible':['|',('state','=','draft'),('state','=','confirmed')]}" />
 						<field name="state" widget="statusbar" />
 					</header>
 					<group>
 						<field name="recap_date" />
-						<field name="calculated_date"   />
+						<field name="calculated_date"  readonly="1" />
+						<field name="calculated_by"  readonly="1" />
 						<field name="confirm_by"/>
 						<field name="operation_count" />
 						<field name="stock_picking_type_id" />
-						<field name="stock_recap_line_ids" />
-						<field name="stock_move_ids" />
+						<field name="stock_recap_line_ids" readonly="1" />
+						<field name="stock_move_ids" readonly="1" />
 					</group>
 				</form>
 			</field>
@@ -31,6 +34,7 @@
 				<tree >
 					<field name="recap_date" />
 					<field name="calculated_date"   />
+					<field name="calculated_by"   />
 					<field name="confirm_by"/>
 					<field name="state" />
 					<field name="operation_count" />
