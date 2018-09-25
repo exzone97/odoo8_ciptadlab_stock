@@ -6,6 +6,7 @@ class stock_picking_recap(models.Model):
     _description = ''
 
     recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: field.datetime.now())
+    calculated_date = fields.Datetime('Calculated Date)
     # BELUM : calculate by diisi otomatis
     calculated_by = fields.Many2one('res.user', 'Calculated By')
     comfirm_date = fields.Datetime('Confirm Date')
