@@ -1,17 +1,18 @@
 from openerp import models, fields, api
 from openerp.exceptions import ValidationError
+from datetime import datetime
 
 class stock_picking_recap(models.Model):
     _name = 'stock.picking.recap'
     _description = ''
 
-    recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: field.datetime.now())
-    calculated_date = fields.Datetime('Calculated Date)
+    recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: datetime.now())
+    calculated_date = fields.Datetime('Calculated Date')
     # BELUM : calculate by diisi otomatis
     calculated_by = fields.Many2one('res.user', 'Calculated By')
     comfirm_date = fields.Datetime('Confirm Date')
     # BELUM : confirm by diisi otomatis
-    confirm_by = fields.Many2one('res.user', 'Confirm By', default=lambda self: self.env.user)
+    confirm_by = fields.Many2one('res.user', 'Confirm By', readonly=True)
     state = fields.Selection(
         selection=[
             ('draft', 'Draft'),

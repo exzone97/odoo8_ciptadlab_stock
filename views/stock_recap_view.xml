@@ -1,5 +1,50 @@
 <openerp>
 	<data>
+		<menuitem sequence="23" id="stock_picking_recap_root" name="Stock Picking Recap" />
+		<menuitem sequence="1" id="stock_picking_recap_menu" name="recap" parent="stock_picking_recap_root" /> 
+		<!-- Fee Setting =============================================================================================================== -->
+		<record id="stock_picking_recap_form" model="ir.ui.view">
+			<field name="name">stock.picking.recap.form</field>
+			<field name="model">stock.picking.recap</field>
+			<field name="arch" type="xml">
+				<form >
+					<header>
+						<field name="state" widget="statusbar" />
+					</header>
+					<group>
+						<field name="recap_date" />
+						<field name="calculated_date"   />
+						<field name="confirm_by"/>
+						<field name="operation_count" />
+						<field name="stock_picking_type_id" />
+						<field name="stock_recap_line_ids" />
+						<field name="stock_move_ids" />
+					</group>
+				</form>
+			</field>
+		</record>
 
+		<record model="ir.ui.view" id="stock_picking_recap_tree">
+			<field name="name">stock.picking.recap.tree</field>
+			<field name="model">stock.picking.recap</field>
+			<field name="arch" type="xml">
+				<tree >
+					<field name="recap_date" />
+					<field name="calculated_date"   />
+					<field name="confirm_by"/>
+					<field name="state" />
+					<field name="operation_count" />
+				</tree>
+			</field>
+		</record>
+
+		<record id="stock_picking_recap_setting" model="ir.actions.act_window">
+			<field name="name">Stock Picking Recap Setting</field>
+			<field name="res_model">stock.picking.recap</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<menuitem sequence="1" id="stock_picking_recap_menu_setting" parent="stock_picking_recap_menu" action="stock_picking_recap_setting" />
 	</data>
 </openerp>
