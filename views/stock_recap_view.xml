@@ -1,9 +1,9 @@
 <openerp>
 	<data>
 		<menuitem sequence="23" id="stock_picking_recap_root" name="Stock Picking Recap" />
-		<menuitem sequence="1" id="stock_picking_recap_menu" name="Recap" parent="stock_picking_recap_root" /> 
-		<menuitem sequence="2" id="stock_picking_recap_line_menu" name="Recap Line" parent="stock_picking_recap_root" /> 
-		<menuitem sequence="3" id="stock_move_menu" name="Stock Move" parent="stock_picking_recap_root" /> 
+		<menuitem sequence="1" id="stock_picking_recap_menu" name="Recap" parent="stock_picking_recap_root" />
+		<menuitem sequence="2" id="stock_picking_recap_line_menu" name="Recap Line" parent="stock_picking_recap_root" />
+		<menuitem sequence="3" id="stock_move_menu" name="Stock Move" parent="stock_picking_recap_root" />
 		<!-- Stock Picking Recap =============================================================================================================== -->
 		<record id="stock_picking_recap_form" model="ir.ui.view">
 			<field name="name">stock.picking.recap.form</field>
@@ -23,9 +23,23 @@
 						<field name="operation_count" />
 						<field name="recap_amount" />
 						<field name="stock_picking_type_id" />
-						<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}" />
-						<field name="stock_move_ids" readonly="1" />
 					</group>
+						<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
+							<tree>
+								<field name="recap_id"/>
+								<field name="product_id"/>
+								<field name="qty"/>
+								<field name="unit_price"/>
+								<field name="subtotal"/>
+							</tree>
+						</field>
+						<button type="object" name="" string="Get Unit Price Suggestion"/>
+						<field name="stock_move_ids" readonly="1">
+							<tree>
+								<field name="stock_recap_id"/>
+							</tree>
+						</field>
+
 				</form>
 			</field>
 		</record>

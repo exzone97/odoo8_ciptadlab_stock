@@ -8,10 +8,8 @@ class stock_picking_recap(models.Model):
 
 	recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: datetime.now())
 	calculated_date = fields.Datetime('Calculated Date')
-	# BELUM : calculate by diisi otomatis
 	calculated_by = fields.Many2one('res.users', 'Calculated By')
 	comfirm_date = fields.Datetime('Confirm Date')
-	# BELUM : confirm by diisi otomatis
 	confirm_by = fields.Many2one('res.users', 'Confirm By', readonly=True)
 	state = fields.Selection(
 		selection=[
@@ -37,9 +35,9 @@ class stock_picking_recap(models.Model):
 	def create(self,vals):
 		rec = super(stock_picking_recap, self).create(vals)
 
-		return rec 
+		return rec
 # ACTIONS ------------------------------------------------------------------------------------------------------------------
-	
+
 	@api.multi
 	def action_calculated(self):
 		context = self._context
@@ -56,7 +54,7 @@ class stock_picking_recap(models.Model):
 		context = self._context
 		current_uid = context.get('uid')
 		user = self.env['res.users'].browse(current_uid)
-	
+
 		return self.write({
 			'state': 'confirmed',
 			'confirm_by':user.id
@@ -70,12 +68,13 @@ class stock_picking_recap_line(models.Model):
 	product_id = fields.Many2one('product.product', 'Product', required=True, ondelete='restrict')
 	qty = fields.Float('Quantity')
 	unit_price = fields.Float('Unit Price')
-	# subtotal computed qty*unit_price
 	subtotal = fields.Float('Subtotal',compute="_compute_subtotal")
 
-	@api.one
+	@api.multi
+	@api.depends('qty','unit_price')
 	def _compute_subtotal(self):
-		self.subtotal = self.qty * self.unit_price
+		for record in self
+		record.subtotal = record.qty * record.unit_price
 
 	@api.model
 	def create(self,vals):
@@ -85,8 +84,8 @@ class stock_picking_recap_line(models.Model):
 		product = self.env['product.product'].browse(self.product_id)
 		rec.unit_price = product.standard_price
 
-		return rec 
-		
+		return rec
+
 
 class stock_move(models.Model):
 
