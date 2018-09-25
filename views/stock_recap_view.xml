@@ -24,22 +24,21 @@
 						<field name="recap_amount" />
 						<field name="stock_picking_type_id" />
 					</group>
-						<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
-							<tree>
-								<field name="recap_id"/>
-								<field name="product_id"/>
-								<field name="qty"/>
-								<field name="unit_price"/>
-								<field name="subtotal"/>
-							</tree>
-						</field>
-						<button type="object" name="" string="Get Unit Price Suggestion"/>
-						<field name="stock_move_ids" readonly="1">
-							<tree>
-								<field name="stock_recap_id"/>
-							</tree>
-						</field>
-
+					<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
+						<tree>
+							<field name="recap_id"/>
+							<field name="product_id"/>
+							<field name="qty"/>
+							<field name="unit_price"/>
+							<field name="subtotal"/>
+						</tree>
+					</field>
+					<!-- <button type="object" name="asd" string="Get Unit Price Suggestion"/> -->
+					<field name="stock_move_ids" readonly="1">
+						<tree>
+							<field name="stock_recap_id"/>
+						</tree>
+					</field>
 				</form>
 			</field>
 		</record>

@@ -73,8 +73,8 @@ class stock_picking_recap_line(models.Model):
 	@api.multi
 	@api.depends('qty','unit_price')
 	def _compute_subtotal(self):
-		for record in self
-		record.subtotal = record.qty * record.unit_price
+		for record in self:
+			record.subtotal = record.qty * record.unit_price
 
 	@api.model
 	def create(self,vals):
@@ -88,7 +88,6 @@ class stock_picking_recap_line(models.Model):
 
 
 class stock_move(models.Model):
-
 	_inherit = 'stock.move'
 
 	stock_recap_id = fields.Many2one('stock.picking.recap', 'Stock ID')
