@@ -28,12 +28,16 @@ class stock_picking_recap(models.Model):
 	stock_picking_type_id = fields.Many2one('stock.picking.type', required=True, ondeleted='restrict')
 	stock_recap_line_ids = fields.One2many('stock.picking.recap.line', 'recap_id', 'Detail Recap')
 	stock_move_ids = fields.One2many('stock.move','stock_recap_id', 'Stock Operation Detail', readonly=True)
-
+	stock_move_list = fields.Char('List stock move', invisible=True)
 # OVERRIDE ------------------------------------------------------------------------------------------------------------------
 
 	@api.model
 	def create(self,vals):
 		rec = super(stock_picking_recap, self).create(vals)
+		for record in self.stock_recap_line_ids:
+			record.write({
+					'recap_id': self.id,
+				})
 
 		return rec
 # ACTIONS ------------------------------------------------------------------------------------------------------------------
@@ -60,6 +64,23 @@ class stock_picking_recap(models.Model):
 			'confirm_by':user.id
 		})
 
+	@api.onchange('stock_picking_type_id')
+	def onchange_type_id(self):
+		if(self.stock_recap_line_ids != None) :
+			stock_move = self.env['stock.move'].search([('stock_recap_id','=',self.stock_picking_type_id.id)])
+			recap_line_obj = self.env['stock.picking.recap.line']
+			for stock in stock_move:
+				recap_line = recap_line_obj.create({
+						'product_id': stock.product_id.id,
+						# 'qty': stock.product_uom_qty,
+					})
+				print stock
+				self.write({
+						'stock_recap_line_ids': [(0,0,recap_line)],
+					})
+
+
+
 class stock_picking_recap_line(models.Model):
 	_name = 'stock.picking.recap.line'
 	_description = ''
@@ -75,16 +96,6 @@ class stock_picking_recap_line(models.Model):
 	def _compute_subtotal(self):
 		for record in self:
 			record.subtotal = record.qty * record.unit_price
-
-	@api.model
-	def create(self,vals):
-		rec = super(stock_picking_recap_line, self).create(vals)
-		context = self._context
-		current_uid = context.get('uid')
-		product = self.env['product.product'].browse(self.product_id)
-		rec.unit_price = product.standard_price
-
-		return rec
 
 
 class stock_move(models.Model):
