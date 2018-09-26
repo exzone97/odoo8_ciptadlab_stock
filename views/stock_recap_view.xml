@@ -3,7 +3,7 @@
 		<menuitem sequence="23" id="stock_picking_recap_root" name="Stock Picking Recap" />
 		<menuitem sequence="1" id="stock_picking_recap_menu" name="Recap" parent="stock_picking_recap_root" />
 		<!-- <menuitem sequence="2" id="stock_picking_recap_line_menu" name="Recap Line" parent="stock_picking_recap_root" /> -->
-		<!-- <menuitem sequence="3" id="stock_move_menu" name="Stock Move" parent="stock_picking_recap_root" /> -->
+		<menuitem sequence="3" id="stock_move_menu" name="Stock Move" parent="stock_picking_recap_root" />
 		<!-- Stock Picking Recap =============================================================================================================== -->
 		<record id="stock_picking_recap_form" model="ir.ui.view">
 			<field name="name">stock.picking.recap.form</field>
@@ -25,7 +25,7 @@
 						<field name="stock_picking_type_id" />
 					</group>
 					<!-- tambahkan button di atas o2m stock_recap_line_ids yaitu Get Unit Price Suggestion. -->
-					<button type="object" name="asd" string="Get Unit Price Suggestion"/>
+					<button type="object" name="action_get_avg" string="Get Unit Price Suggestion"/>
 					<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
 						<!-- o2m tree di form stock,picking.recap tidak boleh create atau delete -->
 						<tree delete="false" create="false">
@@ -109,7 +109,7 @@
 		<menuitem sequence="1" id="stock_picking_recap_line_menu_setting" parent="stock_picking_recap_line_menu" action="stock_picking_recap_line_setting" /> -->
 
 		<!-- Stock Picking Move =============================================================================================================== -->
-		<!-- <record id="stock_move_form" model="ir.ui.view">
+		<record id="stock_move_form" model="ir.ui.view">
 			<field name="name">stock.move.form</field>
 			<field name="model">stock.move</field>
 			<field name="arch" type="xml">
@@ -136,6 +136,6 @@
 			<field name="view_mode">tree,form</field>
 		</record>
 
-		<menuitem sequence="1" id="stock_move_menu_setting" parent="stock_move_menu" action="stock_move_setting" /> -->
+		<menuitem sequence="1" id="stock_move_menu_setting" parent="stock_move_menu" action="stock_move_setting" />
 	</data>
 </openerp>

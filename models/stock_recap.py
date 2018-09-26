@@ -64,20 +64,32 @@ class stock_picking_recap(models.Model):
 			'confirm_by':user.id
 		})
 
+# 	@api.onchange('stock_picking_type_id')
+# 	def onchange_type_id(self):
+# 		if(self.stock_recap_line_ids != None) :
+# 			stock_move = self.env['stock.move'].search([('stock_recap_id','=',self.stock_picking_type_id.id)])
+# 			recap_line_obj = self.env['stock.picking.recap.line']
+# 			for stock in stock_move:
+# 				recap_line = recap_line_obj.create({
+# 						'product_id': stock.product_id.id,
+# 						# 'qty': stock.product_uom_qty,
+# 					})
+# 				print stock
+# 				self.write({
+# 						'stock_recap_line_ids': [(0,0,recap_line)],
+# 	})
+
 	@api.onchange('stock_picking_type_id')
 	def onchange_type_id(self):
-		if(self.stock_recap_line_ids != None) :
-			stock_move = self.env['stock.move'].search([('stock_recap_id','=',self.stock_picking_type_id.id)])
-			recap_line_obj = self.env['stock.picking.recap.line']
-			for stock in stock_move:
-				recap_line = recap_line_obj.create({
-						'product_id': stock.product_id.id,
-						# 'qty': stock.product_uom_qty,
-					})
-				print stock
-				self.write({
-						'stock_recap_line_ids': [(0,0,recap_line)],
-					})
+		picking_id = self.stock_picking_type_id.id
+		stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
+		recap_line_obj = self.env['stock.picking.recap.line']
+		for stock in stock_move:
+			recap_line = recap_line_obj.create({
+				'product_id': stock.product_id.id,
+				'qty': stock.product_uom_qty,
+			})
+			self.stock_recap_line_ids = recap_line
 
 
 
