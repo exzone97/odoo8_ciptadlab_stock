@@ -66,7 +66,7 @@ class stock_picking_recap(models.Model):
 
 	@api.onchange('stock_picking_type_id')
 	def onchange_type_id(self):
-		if(self.stock_recap_line_ids != None) :
+		if self.stock_recap_line_ids != None :
 			stock_move = self.env['stock.move'].search([('stock_recap_id','=',self.stock_picking_type_id.id)])
 			recap_line_obj = self.env['stock.picking.recap.line']
 			for stock in stock_move:
