@@ -24,16 +24,17 @@
 						<field name="recap_amount" />
 						<field name="stock_picking_type_id" />
 					</group>
+					<!-- tambahkan button di atas o2m stock_recap_line_ids yaitu Get Unit Price Suggestion. -->
+					<button type="object" name="action_get_avg" string="Get Unit Price Suggestion"/>
 					<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
-						<tree>
-							<field name="recap_id"/>
+						<!-- o2m tree di form stock,picking.recap tidak boleh create atau delete -->
+						<tree delete="false" create="false">
 							<field name="product_id"/>
 							<field name="qty"/>
 							<field name="unit_price"/>
 							<field name="subtotal"/>
 						</tree>
 					</field>
-					<!-- <button type="object" name="asd" string="Get Unit Price Suggestion"/> -->
 					<field name="stock_move_ids" readonly="1">
 						<tree>
 							<field name="stock_recap_id"/>

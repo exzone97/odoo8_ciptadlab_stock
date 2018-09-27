@@ -22,10 +22,10 @@ class stock_picking_recap(models.Model):
 		default='draft'
 	)
 	# BELUM : operation_count compute jumlah operation yang direkap dibawah rekapan ini
-	operation_count = fields.Integer('Operation Count')
+	operation_count = fields.Integer('Operation Count', readonly=True)
 	# BELUM : recap_amount  nilai uang rekap ini, dihitung sebagai sum(subtotal) seluruh stock.picking.recap.line dibawahnya
-	recap_amount = fields.Float('Recap Amount')
-	stock_picking_type_id = fields.Many2one('stock.picking.type', required=True, ondeleted='restrict')
+	recap_amount = fields.Float('Recap Amount', readonly=True)
+	stock_picking_type_id = fields.Many2one('stock.picking.type', required=True, ondeleted='restrict', default=None)
 	stock_recap_line_ids = fields.One2many('stock.picking.recap.line', 'recap_id', 'Detail Recap')
 	stock_move_ids = fields.One2many('stock.move','stock_recap_id', 'Stock Operation Detail', readonly=True)
 	stock_move_list = fields.Char('List stock move', invisible=True)
@@ -34,10 +34,13 @@ class stock_picking_recap(models.Model):
 	@api.model
 	def create(self,vals):
 		rec = super(stock_picking_recap, self).create(vals)
-		for record in self.stock_recap_line_ids:
-			record.write({
-					'recap_id': self.id,
-				})
+		count = 0
+		print rec.stock_recap_line_ids
+		for record in rec.stock_recap_line_ids:
+			print count
+			count += 1
+			record.recap_id = rec.id
+		rec.operation_count = count
 
 		return rec
 # ACTIONS ------------------------------------------------------------------------------------------------------------------
@@ -66,18 +69,43 @@ class stock_picking_recap(models.Model):
 
 	@api.onchange('stock_picking_type_id')
 	def onchange_type_id(self):
-		if self.stock_recap_line_ids != None :
-			stock_move = self.env['stock.move'].search([('stock_recap_id','=',self.stock_picking_type_id.id)])
+		if self.stock_recap_line_ids != None :	
+			picking_id = self.stock_picking_type_id.id
+			stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
 			recap_line_obj = self.env['stock.picking.recap.line']
+			recap_line_obj_2 = recap_line_obj
+			lines = {}
 			for stock in stock_move:
-				recap_line = recap_line_obj.create({
-						'product_id': stock.product_id.id,
-						# 'qty': stock.product_uom_qty,
-					})
-				print stock
-				self.write({
-						'stock_recap_line_ids': [(0,0,recap_line)],
-					})
+				if stock.product_id.id in lines:
+					lines[stock.product_id.id]['qty'] += stock.product_uom_qty
+					continue
+
+				lines[stock.product_id.id] = {
+					'product_id': stock.product_id.id,
+					'qty': stock.product_uom_qty,
+				}
+
+			count = 0
+			for id, line in lines.items():
+				recap_line_obj += recap_line_obj.new({
+					'product_id': line['product_id'],
+					'qty': line['qty']
+				})
+				count +=1
+			self.stock_recap_line_ids += recap_line_obj
+
+
+			# (0, 0, {
+			# 		'product_id': line['product_id'],
+			# 		'qty': line['qty']
+			# 		})
+			# for record in recap_line_obj
+			# 	temp = record.id
+			# 'lot_id': lot.id, 'qty': barcode_dict[lot]
+			# self.write({
+			# 		'stock_recap_line_ids': (0,0, {recap_line_obj})
+			# 	}) 
+			self.operation_count = count
 
 
 
@@ -97,6 +125,11 @@ class stock_picking_recap_line(models.Model):
 		for record in self:
 			record.subtotal = record.qty * record.unit_price
 
+	@api.onchange('unit_price')
+	def _compute_recap_amount(self):
+		recap_obj = self.env['stock.picking.recap'].search([('id','=',self.recap_id)])
+		for record in self:
+			recap_obj.recap_amount += self.subtotal 
 
 class stock_move(models.Model):
 	_inherit = 'stock.move'
