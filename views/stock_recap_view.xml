@@ -28,16 +28,17 @@
 					<button type="object" name="action_get_avg" string="Get Unit Price Suggestion"/>
 					<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
 						<!-- o2m tree di form stock,picking.recap tidak boleh create atau delete -->
-						<tree delete="false" create="false">
+						<tree delete="false" create="false" version="7.0" editable="bottom">
 							<field name="product_id"/>
 							<field name="qty"/>
 							<field name="unit_price"/>
 							<field name="subtotal"/>
 						</tree>
 					</field>
-					<field name="stock_move_ids" readonly="1">
+					<field name="stock_move_ids" readonly="1"  >
 						<tree>
-							<field name="stock_recap_id"/>
+							<field name="id" />
+							<field name="name" />
 						</tree>
 					</field>
 				</form>

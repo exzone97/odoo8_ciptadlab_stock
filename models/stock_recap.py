@@ -36,16 +36,16 @@ class stock_picking_recap(models.Model):
 		rec = super(stock_picking_recap, self).create(vals)
 		count = 0
 		for record in rec.stock_recap_line_ids:
-			count += 1
 			record.recap_id = rec.id
-		rec.operation_count = count
 		picking_id = rec.stock_picking_type_id.id
 		stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
 		print picking_id 
 		print stock_move
 		for record in stock_move:
+			count += 1
 			record.stock_recap_id = rec.id
 			print record.id
+		rec.operation_count = count
 
 		return rec
 # ACTIONS ------------------------------------------------------------------------------------------------------------------
@@ -78,6 +78,7 @@ class stock_picking_recap(models.Model):
 
 	@api.onchange('stock_picking_type_id')
 	def onchange_type_id(self):
+		count = 0
 		if self.stock_recap_line_ids != None :	
 			picking_id = self.stock_picking_type_id.id
 			stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
@@ -85,6 +86,7 @@ class stock_picking_recap(models.Model):
 			recap_line_obj_2 = recap_line_obj
 			lines = {}
 			for stock in stock_move:
+				count +=1
 				if stock.stock_recap_id.id == False:
 					if stock.product_id.id in lines:
 						lines[stock.product_id.id]['qty'] += stock.product_uom_qty
@@ -95,15 +97,12 @@ class stock_picking_recap(models.Model):
 						'qty': stock.product_uom_qty,
 					}
 				print stock.id
-
-			count = 0
 			for id, line in lines.items():
 				recap_line_obj += recap_line_obj.new({
 					'product_id': line['product_id'],
 					'qty': line['qty']
 				})
-				count +=1
-			self.stock_recap_line_ids += recap_line_obj
+			self.stock_recap_line_ids = recap_line_obj
 
 
 			# (0, 0, {
