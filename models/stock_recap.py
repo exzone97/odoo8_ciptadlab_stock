@@ -35,12 +35,17 @@ class stock_picking_recap(models.Model):
 	def create(self,vals):
 		rec = super(stock_picking_recap, self).create(vals)
 		count = 0
-		print rec.stock_recap_line_ids
 		for record in rec.stock_recap_line_ids:
-			print count
 			count += 1
 			record.recap_id = rec.id
 		rec.operation_count = count
+		picking_id = rec.stock_picking_type_id.id
+		stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
+		print picking_id 
+		print stock_move
+		for record in stock_move:
+			record.stock_recap_id = rec.id
+			print record.id
 
 		return rec
 # ACTIONS ------------------------------------------------------------------------------------------------------------------
@@ -50,10 +55,14 @@ class stock_picking_recap(models.Model):
 		context = self._context
 		current_uid = context.get('uid')
 		user = self.env['res.users'].browse(current_uid)
+		total = 0
+		for record in self.stock_recap_line_ids:
+			total += record.subtotal
 		return self.write({
 			'state': 'calculated',
 			'calculated_by': user.id,
 			'calculated_date': datetime.now(),
+			'recap_amount': total
 		})
 
 	@api.multi
@@ -76,14 +85,16 @@ class stock_picking_recap(models.Model):
 			recap_line_obj_2 = recap_line_obj
 			lines = {}
 			for stock in stock_move:
-				if stock.product_id.id in lines:
-					lines[stock.product_id.id]['qty'] += stock.product_uom_qty
-					continue
+				if stock.stock_recap_id.id == False:
+					if stock.product_id.id in lines:
+						lines[stock.product_id.id]['qty'] += stock.product_uom_qty
+						continue
 
-				lines[stock.product_id.id] = {
-					'product_id': stock.product_id.id,
-					'qty': stock.product_uom_qty,
-				}
+					lines[stock.product_id.id] = {
+						'product_id': stock.product_id.id,
+						'qty': stock.product_uom_qty,
+					}
+				print stock.id
 
 			count = 0
 			for id, line in lines.items():
@@ -127,9 +138,7 @@ class stock_picking_recap_line(models.Model):
 
 	@api.onchange('unit_price')
 	def _compute_recap_amount(self):
-		recap_obj = self.env['stock.picking.recap'].search([('id','=',self.recap_id)])
-		for record in self:
-			recap_obj.recap_amount += self.subtotal 
+		self.subtotal = self.qty * self.unit_price 
 
 class stock_move(models.Model):
 	_inherit = 'stock.move'
