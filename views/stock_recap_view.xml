@@ -29,10 +29,10 @@
 					<field name="stock_recap_line_ids" attrs="{'readonly':[('state','!=','draft')]}">
 						<!-- o2m tree di form stock,picking.recap tidak boleh create atau delete -->
 						<tree delete="false" create="false" version="7.0" editable="bottom">
-							<field name="product_id"/>
-							<field name="qty"/>
+							<field name="product_id" readonly="1" />
+							<field name="qty" readonly="1" />
 							<field name="unit_price"/>
-							<field name="subtotal"/>
+							<field name="subtotal" readonly="1" />
 						</tree>
 					</field>
 					<field name="stock_move_ids" readonly="1"  >
