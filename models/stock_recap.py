@@ -1,12 +1,13 @@
 from openerp import models, fields, api
 from openerp.exceptions import ValidationError
-from datetime import datetime
+import datetime
+from dateutil.relativedelta import relativedelta
 
 class stock_picking_recap(models.Model):
 	_name = 'stock.picking.recap'
 	_description = ''
 
-	recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: datetime.now())
+	recap_date  = fields.Datetime('Recap Date', required=True, default=lambda self: datetime.datetime.now())
 	calculated_date = fields.Datetime('Calculated Date')
 	calculated_by = fields.Many2one('res.users', 'Calculated By')
 	comfirm_date = fields.Datetime('Confirm Date')
@@ -39,8 +40,6 @@ class stock_picking_recap(models.Model):
 			record.recap_id = rec.id
 		picking_id = rec.stock_picking_type_id.id
 		stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
-		print picking_id 
-		print stock_move
 		for record in stock_move:
 			count += 1
 			record.stock_recap_id = rec.id
@@ -61,7 +60,7 @@ class stock_picking_recap(models.Model):
 		return self.write({
 			'state': 'calculated',
 			'calculated_by': user.id,
-			'calculated_date': datetime.now(),
+			'calculated_date': datetime.datetime.now(),
 			'recap_amount': total
 		})
 
@@ -76,45 +75,44 @@ class stock_picking_recap(models.Model):
 			'confirm_by':user.id
 		})
 
+	@api.one
+	def action_get_avg(self):
+		lines = self.stock_recap_line_ids
+		for record in lines:
+			count = 0
+			unit_price = 0
+			tanggal = datetime.datetime.now() - relativedelta(months = 3)
+			recap_lines_obj = self.env['stock.picking.recap.line'].search([('product_id','=',record.product_id.id),('create_date' ,'>',tanggal.strftime("%Y-%m-%d")),('unit_price','>',0)])
+			for record2 in recap_lines_obj:
+				unit_price += record2.unit_price
+				count += 1
+			unit_price = unit_price /count	
+			record.unit_price = unit_price
+
 	@api.onchange('stock_picking_type_id')
 	def onchange_type_id(self):
-		count = 0
 		if self.stock_recap_line_ids != None :	
+			count = 0
 			picking_id = self.stock_picking_type_id.id
-			stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id)])
+			stock_move = self.env['stock.move'].search([('picking_type_id.id','=',picking_id),('stock_recap_id','=',False)])
 			recap_line_obj = self.env['stock.picking.recap.line']
-			recap_line_obj_2 = recap_line_obj
 			lines = {}
 			for stock in stock_move:
 				count +=1
-				if stock.stock_recap_id.id == False:
-					if stock.product_id.id in lines:
-						lines[stock.product_id.id]['qty'] += stock.product_uom_qty
-						continue
+				if stock.product_id.id in lines:
+					lines[stock.product_id.id]['qty'] += stock.product_uom_qty
+					continue
 
-					lines[stock.product_id.id] = {
-						'product_id': stock.product_id.id,
-						'qty': stock.product_uom_qty,
-					}
-				print stock.id
+				lines[stock.product_id.id] = {
+					'product_id': stock.product_id.id,
+					'qty': stock.product_uom_qty,
+				}
 			for id, line in lines.items():
 				recap_line_obj += recap_line_obj.new({
 					'product_id': line['product_id'],
 					'qty': line['qty']
 				})
 			self.stock_recap_line_ids = recap_line_obj
-
-
-			# (0, 0, {
-			# 		'product_id': line['product_id'],
-			# 		'qty': line['qty']
-			# 		})
-			# for record in recap_line_obj
-			# 	temp = record.id
-			# 'lot_id': lot.id, 'qty': barcode_dict[lot]
-			# self.write({
-			# 		'stock_recap_line_ids': (0,0, {recap_line_obj})
-			# 	}) 
 			self.operation_count = count
 
 

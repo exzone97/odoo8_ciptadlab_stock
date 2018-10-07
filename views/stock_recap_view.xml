@@ -35,12 +35,6 @@
 							<field name="subtotal" readonly="1" />
 						</tree>
 					</field>
-					<field name="stock_move_ids" readonly="1"  >
-						<tree>
-							<field name="id" />
-							<field name="name" />
-						</tree>
-					</field>
 				</form>
 			</field>
 		</record>
