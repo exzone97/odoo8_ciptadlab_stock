@@ -88,7 +88,10 @@ class stock_picking_recap(models.Model):
 			for record2 in recap_lines_obj:
 				unit_price += record2.unit_price
 				count += 1
-			unit_price = unit_price / count	
+			if count == 0:
+				unit_price = 0
+			else:
+				unit_price = unit_price / count	
 			record.unit_price = unit_price
 
 	@api.onchange('stock_picking_type_id')
@@ -108,16 +111,29 @@ class stock_picking_recap(models.Model):
 				lines[stock.product_id.id] = {
 					'product_id': stock.product_id.id,
 					'qty': stock.product_uom_qty,
+					'product_uom': stock.product_uom
 				}
 			for id, line in lines.items():
 				recap_line_obj += recap_line_obj.new({
 					'product_id': line['product_id'],
-					'qty': line['qty']
+					'qty': line['qty'],
+					'product_uom': line['product_uom']
 				})
 			self.stock_recap_line_ids = recap_line_obj
 			self.operation_count = count
 
+	"""
+	def find_uom_by_product_id(self, product_id=False):
 
+		if not product_id:
+			return {}
+
+		product = self.env['product.product'].browse(product_id)
+		result = {
+			'product_uom': product.uom_id.id
+		}
+		return {'value': result}
+	"""
 
 class stock_picking_recap_line(models.Model):
 	_name = 'stock.picking.recap.line'
@@ -128,6 +144,8 @@ class stock_picking_recap_line(models.Model):
 	qty = fields.Float('Quantity')
 	unit_price = fields.Float('Unit Price')
 	subtotal = fields.Float('Subtotal',compute="_compute_subtotal")
+	product_uom = fields.Many2one('product.uom', 'Unit of Measure', required=True, help="Default Unit of Measure used for all stock operation.")
+
 
 	@api.multi
 	@api.depends('qty','unit_price')
@@ -138,6 +156,7 @@ class stock_picking_recap_line(models.Model):
 	@api.onchange('unit_price')
 	def _compute_recap_amount(self):
 		self.subtotal = self.qty * self.unit_price 
+
 
 class stock_move(models.Model):
 	_inherit = 'stock.move'
