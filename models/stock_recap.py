@@ -3,6 +3,8 @@ from openerp.exceptions import ValidationError
 import datetime
 from dateutil.relativedelta import relativedelta
 
+number_of_month = 3
+
 class stock_picking_recap(models.Model):
 	_name = 'stock.picking.recap'
 	_description = ''
@@ -81,12 +83,12 @@ class stock_picking_recap(models.Model):
 		for record in lines:
 			count = 0
 			unit_price = 0
-			tanggal = datetime.datetime.now() - relativedelta(months = 3)
+			tanggal = datetime.datetime.now() - relativedelta(months = number_of_month)
 			recap_lines_obj = self.env['stock.picking.recap.line'].search([('product_id','=',record.product_id.id),('create_date' ,'>',tanggal.strftime("%Y-%m-%d")),('unit_price','>',0)])
 			for record2 in recap_lines_obj:
 				unit_price += record2.unit_price
 				count += 1
-			unit_price = unit_price /count	
+			unit_price = unit_price / count	
 			record.unit_price = unit_price
 
 	@api.onchange('stock_picking_type_id')
